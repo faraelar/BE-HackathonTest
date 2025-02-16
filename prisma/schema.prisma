@@ -1,0 +1,95 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+model User {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  email    String  @unique
+  name     String
+  password String
+  iconImg  String
+  isAlowed Boolean @default(false)
+  emailStatus Boolean @default(false)
+  code String
+  authorRating Int   @default(0)  
+  userRating Int @default(0) 
+  yourQuiz     Quiz[]  
+  userInRoom UserInRoom[]
+  questComplete QuestComplete[]
+ }
+model Quiz {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  title  String
+  description String
+  img    String? 
+  time Int
+  rating Int
+  authorId String @db.ObjectId
+  author   User   @relation(fields: [authorId], references: [id])
+  quests Quest[]
+  quizInRoom Room[]
+
+  questComplete QuestComplete[] 
+}
+
+model Quest {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  title      String
+  type       String
+  img        String?
+  quizId     String @db.ObjectId
+  quiz       Quiz   @relation(fields: [quizId], references: [id])
+  answers  Answer[]
+  quizInRoomId String[]   @db.ObjectId
+  quizInRoom Room[] @relation(fields: [quizInRoomId], references: [id])
+
+}
+model QuestComplete{
+  id         String @id @default(auto()) @map("_id") @db.ObjectId 
+  correctAnswer Int 
+  timeStart String 
+  time Int 
+  userId String @db.ObjectId                                       
+  user   User   @relation(fields: [userId], references: [id])      
+  quizId String @db.ObjectId                                        
+  quiz   Quiz   @relation(fields: [quizId], references: [id])       
+}
+model Answer {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  text     String  
+  isCorrect Boolean
+  questId  String  @db.ObjectId
+  quest    Quest   @relation(fields: [questId], references: [id])
+}
+
+model Room{
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId 
+  userInRoom UserInRoom[]
+  quizInRoomId String  @db.ObjectId                                                
+  quizInRoom  Quiz    @relation(fields: [quizInRoomId], references: [id])              
+  questId String[]   @db.ObjectId
+  quest    Quest[]  @relation(fields: [questId], references: [id])  
+  currentQuest String? @default("")
+  time Int?
+  }
+model UserInRoom{
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId  
+  userId String @unique @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id])
+  roomId String @db.ObjectId                                               
+  room    Room   @relation(fields: [roomId], references: [id])  
+  correctAnswer Int
+  time Int
+  socketId String?
+  state Boolean @default(false) 
+}
+
