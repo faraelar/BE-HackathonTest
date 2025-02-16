@@ -61,7 +61,7 @@ export class AuthService {
       await res.cookie('temporarytoken', temporaryToken, {
         httpOnly: true,
         secure: true,
-        sameSite: 'strict',
+        sameSite: 'none',
       });
       console.log('ept');
       return 'This action returns all cats';
@@ -200,8 +200,8 @@ export class AuthService {
     try {
       return res.cookie('token', token, {
         httpOnly: true,
-        secure: false,
-        sameSite: 'strict',
+        secure: true,
+        sameSite: 'none',
       });
 
     } catch (e) {
