@@ -185,7 +185,8 @@ export class AuthService {
       res.cookie('token', token, {
         httpOnly: true,
         secure: false,
-        sameSite: 'strict',
+        sameSite: 'none',
+
       });
       return '';
     } catch (error) {
